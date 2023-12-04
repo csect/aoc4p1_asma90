@@ -1,0 +1,15 @@
+         MACRO
+         $SEARCH ,
+         GBLB  &FOUND      OUTPUT
+         GBLC  &WREC       INPUT WINNING VALUES
+         GBLC  &N          INPUT SEARCH FOR VALUE
+&VAR     SETA  0
+&ARG     SETC  ' &N '
+&FOUND   SETB  0
+&VAR     SETA  INDEX('&WREC','&ARG')
+         AIF   (&VAR EQ 0).SKP10
+.SKP10   ANOP
+
+&FOUND   SETB  (&VAR NE 0)
+         MEND
+

@@ -1,0 +1,44 @@
+         MACRO
+         $READ &FUNC
+         GBLC  &N          CURR NUMBER
+         GBLA  &NDX        CURR NUMBER
+         GBLC  &WREC       CURR RECORD (WINNERS)
+         GBLC  &CREC       CURR RECORD (SINGLE CARD)
+         GBLC  &REC        CURR RECORD ARG
+         GBLB  &FOUND      CURR NUM FOUND?
+&GTOT    SETA  0
+
+.WIN100  ANOP  ,           --OUTER LOOP
+         ACTR  10000
+&TOT     SETA  0
+&WREC    AREAD ,   READ THE WINNERS RECORD
+         AIF   ('&WREC'(1,1) EQ '-').FIN100
+&CREC    AREAD ,   READ THE CURRENT CARD
+&REC     SETC  '&CREC'     SET RECORD FOR PROBE
+&NDX     SETA  1           SET START INDEX FOR PROBE
+.WIN105  ANOP
+         $PROBE ,          EXTRACT NEXT NUMBER &N
+         AIF   ('&N' EQ '').WIN190   DONE WITH THIS ONE
+         $SEARCH ,
+         AIF   (&FOUND).WIN110
+         AGO   .WIN180
+
+.WIN110  ANOP  ,
+         AIF   (&TOT EQ 0).WIN115
+&TOT     SETA  &TOT*2        SUBSEQUENT TIMES
+         AGO   .WIN180
+.WIN115  ANOP
+&TOT     SETA  1             FIRST TIME
+         AGO   .WIN180
+
+.WIN180  ANOP
+&NDX     SETA  &NDX+1      SET START INDEX FOR PROBE
+         AGO   .WIN105
+
+.WIN190  ANOP
+&GTOT    SETA  &GTOT+&TOT
+         AGO   .WIN100          NEXT
+         MEXIT
+.FIN100  ANOP
+         MNOTE 0,'FINAL TOTAL IS &GTOT'
+         MEND

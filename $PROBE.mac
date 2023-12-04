@@ -1,0 +1,40 @@
+         MACRO
+         $PROBE ,
+         GBLC  &REC        INPUT RECORD
+         GBLA  &NDX        INPUT START INDEX
+         GBLC  &N          OUTPUT NUMERIC VAL (EMPTY STRING ON EOD)
+&NDXA    SETA  &NDX      START OF CURRENT NUMBER
+&NFND    SETB  0         HAVE NOT HIT A NUMBER YET
+.*--------------------------------------------------------------------
+.* LOOP - PROBE FOR NUMERICS, SET &N TO NEXT NUMBER FOUND
+.*--------------------------------------------------------------------
+.WIN105  ANOP  ,         SCAN FOR NUMBERS
+         AIF   (&NDX GE 79).WIN200
+         AIF   (&NFND).WIN140         HAVE NUM, CHECK NEXT
+         AIF   ('&REC'(&NDX,1)   GE '0').WIN130
+         AGO   .WIN180
+.WIN130  ANOP
+&NFND    SETB  1         HAVE HIT A NUMBER
+&NDXA    SETA  &NDX      REMEMBER START POS OF NUMBER
+         AGO   .WIN180
+
+.WIN140  ANOP
+&NFND    SETB  ('&REC'(&NDX,1) GE '0')    NUMBER YET
+         AIF   (&NFND).WIN180           STILL INSIDE A NUM,GO ON
+
+.* END OF A NUMBER REACHED
+&LL      SETA  &NDX-&NDXA
+&N       SETC  '&REC'(&NDXA,&LL)
+         AGO   .WIN190
+
+.* KEEP LOOKING
+.WIN180  ANOP
+&NDX     SETA  &NDX+1
+         AGO   .WIN105
+
+.WIN190  ANOP
+         MEXIT
+.WIN200  ANOP
+&N       SETC  ''
+         MEXIT
+         MEND
